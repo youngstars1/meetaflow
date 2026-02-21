@@ -259,6 +259,7 @@ h4,
   font-family: 'Space Grotesk', sans-serif;
   letter-spacing: -0.02em;
   font-weight: 500;
+  color: var(--text-primary);
 }
 
 /* =================== SCROLLBAR =================== */
@@ -456,7 +457,7 @@ h4,
 /* =================== GLASS CARDS =================== */
 .card-wealth {
   background: var(--bg-card);
-  border: var(--glass-border);
+  border: var(--border-color);
   border-radius: var(--radius-lg);
   padding: 24px;
   position: relative;

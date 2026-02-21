@@ -338,7 +338,7 @@ function GuideSection({ section, isOpen, onToggle }) {
                     }}>
                         <Icon size={18} color={section.color} />
                     </div>
-                    <span className="font-title" style={{ fontSize: 15, fontWeight: 600 }}>{section.title}</span>
+                    <span className="font-title" style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{section.title}</span>
                 </div>
                 <motion.div
                     animate={{ rotate: isOpen ? 180 : 0 }}
@@ -425,8 +425,8 @@ export default function HelpGuide() {
                         <BookOpen size={20} color="var(--accent-primary)" />
                     </div>
                     <div>
-                        <h1 className="page-title" style={{ fontSize: 32 }}>Guía Profesional</h1>
-                        <p className="page-subtitle" style={{ marginTop: 2 }}>Domina MetaFlow y transforma tu relación con el dinero</p>
+                        <h1 className="page-title" style={{ fontSize: 32, color: 'var(--text-primary)' }}>Guía Profesional</h1>
+                        <p className="page-subtitle" style={{ marginTop: 2, color: 'var(--text-secondary)' }}>Domina MetaFlow y transforma tu relación con el dinero</p>
                     </div>
                 </div>
             </motion.div>
