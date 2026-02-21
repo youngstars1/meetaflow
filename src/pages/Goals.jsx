@@ -36,7 +36,7 @@ const item = {
 };
 
 export default function Goals() {
-    const { state, dispatch, performAction } = useApp();
+    const { state, dispatch } = useApp();
     const { addToast } = useToast();
     const { goals, isLoaded } = state;
     const [showForm, setShowForm] = useState(false);
@@ -109,17 +109,17 @@ export default function Goals() {
         const goalId = currentGoal.id;
 
         try {
-            // Use high-integrity performAction for financial arithmetic
-            await performAction('ADD_SAVINGS_TO_GOAL', { goalId, amount }, (p) => repository.addSavingsToGoal(p.goalId, p.amount));
+            dispatch({ type: 'ADD_SAVINGS_TO_GOAL', payload: { goalId, amount } });
 
-            // Log transaction separately with performAction for persistence
-            await performAction('ADD_TRANSACTION', {
-                type: 'ahorro',
-                amount: amount,
-                category: 'ahorro_meta',
-                date: new Date().toISOString(),
-                note: `Ahorro para: ${currentGoal.name}`,
-            }, (p) => repository.addTransaction(p));
+            dispatch({
+                type: 'ADD_TRANSACTION', payload: {
+                    type: 'ahorro',
+                    amount: amount,
+                    category: 'ahorro_meta',
+                    date: new Date().toISOString(),
+                    note: `Ahorro para: ${currentGoal.name}`,
+                }
+            });
 
             addToast(`${formatCurrency(amount)} añadidos`, { type: 'success' });
             setSavingsAmount('');
@@ -127,7 +127,7 @@ export default function Goals() {
         } catch (error) {
             addToast(`Error al sincronizar ahorro: ${error.message || 'Error de red'}`, { type: 'error' });
         }
-    }, [savingsAmount, showAddSavings, performAction, dispatch, addToast]);
+    }, [savingsAmount, showAddSavings, dispatch, addToast]);
 
     const sortedGoals = useMemo(() => {
         return [...goals].sort((a, b) => {

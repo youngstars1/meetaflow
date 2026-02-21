@@ -14,10 +14,10 @@ import {
     Filter, PiggyBank, Calendar, FileText, Tag, DollarSign, Target
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { repository } from '../lib/repository';
+
 
 export default function Finances() {
-    const { state, dispatch, performAction } = useApp();
+    const { state, dispatch } = useApp();
     const { addToast } = useToast();
     const { transactions, goals, isLoaded } = state;
     const [showForm, setShowForm] = useState(false);
@@ -50,15 +50,10 @@ export default function Finances() {
         };
 
         try {
-            // Register movement with high integrity
-            await performAction('ADD_TRANSACTION', transaction, (p) => repository.addTransaction(p));
+            dispatch({ type: 'ADD_TRANSACTION', payload: transaction });
 
             if (formData.type === 'ahorro' && formData.goalId) {
-                // Atomic savings update
-                await performAction('ADD_SAVINGS_TO_GOAL',
-                    { goalId: formData.goalId, amount },
-                    (p) => repository.addSavingsToGoal(p.goalId, p.amount)
-                );
+                dispatch({ type: 'ADD_SAVINGS_TO_GOAL', payload: { goalId: formData.goalId, amount } });
             }
 
             addToast(`Registro guardado: ${formatCurrency(amount)}`, { type: 'success' });
@@ -67,7 +62,7 @@ export default function Finances() {
         } catch (error) {
             addToast(`Error al procesar movimiento: ${error.message}`, { type: 'error' });
         }
-    }, [formData, performAction, addToast]);
+    }, [formData, dispatch, addToast]);
 
     const handleDelete = useCallback((transactionId) => {
         dispatch({ type: 'DELETE_TRANSACTION', payload: transactionId });
