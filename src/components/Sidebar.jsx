@@ -6,20 +6,9 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { calculateLevel, getLevelTitle, getXPForNextLevel, getLevelIcon } from '../utils/gamification';
 import {
-    LayoutDashboard,
-    Target,
-    Wallet,
-    CalendarCheck,
-    BarChart3,
-    Settings,
-    Smartphone,
-    LogOut,
-    LogIn,
-    User,
-    BookOpen,
-    ExternalLink,
-    Sun,
-    Moon
+    LayoutDashboard, Target, Wallet, CalendarCheck, BarChart3,
+    Settings, Smartphone, LogOut, LogIn, User, BookOpen,
+    ExternalLink, Sun, Moon, ChevronRight
 } from 'lucide-react';
 
 function useInstallPWA() {
@@ -31,10 +20,7 @@ function useInstallPWA() {
             setIsInstalled(true);
             return;
         }
-        const handler = (e) => {
-            e.preventDefault();
-            setDeferredPrompt(e);
-        };
+        const handler = (e) => { e.preventDefault(); setDeferredPrompt(e); };
         window.addEventListener('beforeinstallprompt', handler);
         return () => window.removeEventListener('beforeinstallprompt', handler);
     }, []);
@@ -50,12 +36,34 @@ function useInstallPWA() {
     return { canInstall: !!deferredPrompt && !isInstalled, isInstalled, install };
 }
 
+const NAV_ITEMS = [
+    {
+        group: 'Inteligencia', items: [
+            { to: '/', end: true, icon: LayoutDashboard, label: 'Panel' },
+            { to: '/goals', icon: Target, label: 'Metas' },
+            { to: '/finances', icon: Wallet, label: 'Finanzas' },
+        ]
+    },
+    {
+        group: 'Protocolo', items: [
+            { to: '/routines', icon: CalendarCheck, label: 'Rutinas' },
+            { to: '/statistics', icon: BarChart3, label: 'Estadísticas' },
+        ]
+    },
+    {
+        group: 'Sistema', items: [
+            { to: '/profile', icon: Settings, label: 'Ajustes' },
+            { to: '/guide', icon: BookOpen, label: 'Guía' },
+        ]
+    },
+];
+
 function Sidebar({ isOpen, onClose }) {
     const { state } = useApp();
     const { user, displayName, avatarUrl, logout, configured } = useAuth();
     const { isDark, toggleTheme } = useTheme();
     const { totalXP } = state.gamification;
-    const { canInstall, isInstalled, install } = useInstallPWA();
+    const { canInstall, install } = useInstallPWA();
 
     const level = useMemo(() => calculateLevel(totalXP), [totalXP]);
     const levelTitle = useMemo(() => getLevelTitle(level), [level]);
@@ -64,46 +72,41 @@ function Sidebar({ isOpen, onClose }) {
 
     return (
         <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-            <div className="sidebar-header" style={{ padding: '0 16px', marginBottom: 40 }}>
-                <Link to="/" className="sidebar-logo" onClick={onClose} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <img
-                        src="/metaflow.svg"
-                        alt="MetaFlow"
-                        style={{
-                            width: 40, height: 40, borderRadius: 10,
-                        }}
-                    />
+            {/* ─── Logo ─── */}
+            <div style={{ padding: '0 16px', marginBottom: 36 }}>
+                <Link to="/" className="sidebar-logo" onClick={onClose} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 0 }}>
+                    <img src="/metaflow.svg" alt="MetaFlow" style={{ width: 36, height: 36, borderRadius: 10 }} />
                     <span style={{
-                        fontFamily: 'Space Grotesk', fontSize: 22, fontWeight: 700,
+                        fontFamily: 'Space Grotesk', fontSize: 20, fontWeight: 700,
                         color: 'var(--text-primary)', letterSpacing: '-0.02em'
                     }}>MetaFlow</span>
                 </Link>
             </div>
 
-            {/* XP Level Card */}
-            <div style={{ padding: '0 16px', marginBottom: 32 }}>
+            {/* ─── XP Card ─── */}
+            <div style={{ padding: '0 12px', marginBottom: 28 }}>
                 <div style={{
-                    padding: '14px', borderRadius: 12,
-                    background: 'rgba(0, 245, 212, 0.03)',
-                    border: '1px solid rgba(0, 245, 212, 0.08)',
+                    padding: '14px 14px 12px',
+                    borderRadius: 12,
+                    background: 'var(--success-muted)',
+                    border: '1px solid var(--success-subtle)',
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                        <span style={{ fontSize: 20 }}>{levelIcon}</span>
+                        <span style={{ fontSize: 20, lineHeight: 1 }}>{levelIcon}</span>
                         <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {levelTitle}
                             </div>
-                            <div style={{ fontSize: 10, color: 'var(--accent-primary)' }}>
+                            <div style={{ fontSize: 10, color: 'var(--accent-primary)', fontWeight: 500 }}>
                                 Nivel {level} · {totalXP.toLocaleString()} XP
                             </div>
                         </div>
                     </div>
-                    <div className="liquid-progress">
-                        <motion.div
-                            className="liquid-progress-fill"
+                    <div className="liquid-progress" style={{ height: 4 }}>
+                        <motion.div className="liquid-progress-fill"
                             initial={{ width: 0 }}
                             animate={{ width: `${xpProgress.progress}%` }}
-                            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                         />
                     </div>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6, textAlign: 'right' }}>
@@ -112,67 +115,74 @@ function Sidebar({ isOpen, onClose }) {
                 </div>
             </div>
 
-            <nav className="sidebar-nav" style={{ flex: 1, padding: '0 12px' }}>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '0 16px 12px' }}>Inteligencia</div>
-                <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={onClose}>
-                    <LayoutDashboard size={18} />
-                    <span>Panel de Control</span>
-                </NavLink>
-                <NavLink to="/goals" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={onClose}>
-                    <Target size={18} />
-                    <span>Gestión de Metas</span>
-                </NavLink>
-                <NavLink to="/finances" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={onClose}>
-                    <Wallet size={18} />
-                    <span>Registro Financiero</span>
-                </NavLink>
-
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '24px 16px 12px' }}>Protocolo</div>
-                <NavLink to="/routines" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={onClose}>
-                    <CalendarCheck size={18} />
-                    <span>Rutinas y Disciplina</span>
-                </NavLink>
-                <NavLink to="/statistics" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={onClose}>
-                    <BarChart3 size={18} />
-                    <span>Estadísticas</span>
-                </NavLink>
-
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '24px 16px 12px' }}>Sistema</div>
-                <NavLink to="/profile" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={onClose}>
-                    <Settings size={18} />
-                    <span>Perfil y Ajustes</span>
-                </NavLink>
-                <NavLink to="/guide" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={onClose}>
-                    <BookOpen size={18} />
-                    <span>Guía de Uso</span>
-                </NavLink>
+            {/* ─── Navigation ─── */}
+            <nav style={{ flex: 1, padding: '0 8px' }}>
+                {NAV_ITEMS.map(({ group, items }) => (
+                    <div key={group}>
+                        <div style={{
+                            fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase',
+                            letterSpacing: '0.08em', padding: '16px 16px 8px', fontWeight: 600,
+                        }}>{group}</div>
+                        {items.map(({ to, end, icon: Icon, label }) => (
+                            <NavLink
+                                key={to} to={to} end={end}
+                                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                                onClick={onClose}
+                            >
+                                <Icon size={17} />
+                                <span>{label}</span>
+                            </NavLink>
+                        ))}
+                    </div>
+                ))}
             </nav>
 
-            <div className="sidebar-footer" style={{ padding: 16, borderTop: '1px solid var(--border-color)' }}>
-                {/* Theme Toggle */}
-                <button onClick={toggleTheme} className="theme-toggle-btn" style={{ marginBottom: 12 }}>
+            {/* ─── Footer ─── */}
+            <div style={{ padding: '16px 12px 8px', borderTop: '1px solid var(--border-secondary)' }}>
+                {/* Theme */}
+                <button onClick={toggleTheme} className="theme-toggle-btn" style={{ marginBottom: 10 }}>
                     {isDark ? <Sun size={14} /> : <Moon size={14} />}
                     {isDark ? 'Modo Claro' : 'Modo Oscuro'}
                 </button>
 
+                {/* Install */}
                 {canInstall && (
-                    <button onClick={install} className="btn-wealth" style={{ width: '100%', marginBottom: 12, fontSize: 12, justifyContent: 'center' }}>
+                    <button onClick={install} className="btn-wealth" style={{ width: '100%', marginBottom: 10, fontSize: 12, justifyContent: 'center' }}>
                         <Smartphone size={14} /> Instalar App
                     </button>
                 )}
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: '10px', background: 'rgba(128,128,128,0.1)', overflow: 'hidden', border: '1px solid var(--border-color)', flexShrink: 0 }}>
-                        {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}><User size={16} /></div>}
+                {/* User Info */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, padding: '4px 0' }}>
+                    <div style={{
+                        width: 32, height: 32, borderRadius: 10,
+                        background: 'var(--bg-elevated)', overflow: 'hidden',
+                        border: '1px solid var(--border-secondary)', flexShrink: 0,
+                    }}>
+                        {avatarUrl ? (
+                            <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                        ) : (
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                                <User size={14} />
+                            </div>
+                        )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user ? displayName : 'Modo Local'}</div>
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{user ? 'Nube Activa' : 'Offline'}</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {user ? displayName : 'Modo Local'}
+                        </div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                            {user ? 'Nube Activa' : 'Offline'}
+                        </div>
                     </div>
                 </div>
 
+                {/* Auth */}
                 {user ? (
-                    <button onClick={logout} className="btn-wealth btn-wealth-outline" style={{ width: '100%', fontSize: 11, borderColor: 'rgba(239, 68, 68, 0.3)', color: 'var(--danger)', justifyContent: 'center' }}>
+                    <button onClick={logout} className="btn-wealth btn-wealth-outline" style={{
+                        width: '100%', fontSize: 11, justifyContent: 'center',
+                        borderColor: 'var(--danger-subtle)', color: 'var(--danger)',
+                    }}>
                         <LogOut size={14} /> Cerrar Sesión
                     </button>
                 ) : configured ? (
@@ -181,19 +191,13 @@ function Sidebar({ isOpen, onClose }) {
                     </button>
                 ) : null}
 
-                {/* Youngstars Branding */}
-                <a
-                    href="https://portfolio.youngstarsstore.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="creator-badge"
-                    style={{ marginTop: 16, textDecoration: 'none' }}
-                >
+                {/* Creator */}
+                <a href="https://portfolio.youngstarsstore.com/" target="_blank" rel="noopener noreferrer" className="creator-badge" style={{ marginTop: 12, textDecoration: 'none' }}>
                     <div style={{
-                        width: 28, height: 28, borderRadius: 6,
+                        width: 26, height: 26, borderRadius: 6,
                         background: 'var(--accent-gradient)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 800, fontSize: 13, flexShrink: 0
+                        color: '#fff', fontWeight: 800, fontSize: 12, flexShrink: 0,
                     }}>Y</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)' }}>Youngstars</div>

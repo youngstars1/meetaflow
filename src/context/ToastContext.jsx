@@ -49,11 +49,11 @@ export function ToastProvider({ children }) {
     const renderIcon = (type) => {
         const size = 18;
         switch (type) {
-            case 'success': return <CheckCircle size={size} color="var(--accent-primary)" />;
+            case 'success': return <CheckCircle size={size} color="var(--success)" />;
             case 'error': return <XCircle size={size} color="var(--danger)" />;
-            case 'warning': return <AlertTriangle size={size} color="var(--accent-warm)" />;
-            case 'xp': return <Zap size={size} color="var(--accent-primary)" />;
-            default: return <Info size={size} color="#70d6ff" />;
+            case 'warning': return <AlertTriangle size={size} color="var(--warning)" />;
+            case 'xp': return <Zap size={size} color="var(--success)" />;
+            default: return <Info size={size} color="var(--info)" />;
         }
     };
 
@@ -72,12 +72,12 @@ export function ToastProvider({ children }) {
                         key={toast.id}
                         style={{
                             pointerEvents: 'all', display: 'flex', alignItems: 'center', gap: 12,
-                            padding: '12px 20px', background: 'rgba(10, 10, 11, 0.95)',
-                            border: '1px solid rgba(255,255,255,0.05)',
-                            borderRadius: 12, backdropFilter: 'blur(20px)',
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                            animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                            color: '#fff', fontSize: 13, fontWeight: 500, minWidth: 300,
+                            padding: '12px 16px', background: 'rgba(12, 12, 14, 0.92)',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            borderRadius: 14, backdropFilter: 'blur(24px)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)',
+                            animation: 'toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                            color: '#fafafa', fontSize: 13, fontWeight: 500, minWidth: 280,
                         }}
                     >
                         <span style={{ display: 'flex', flexShrink: 0 }}>{renderIcon(toast.type)}</span>

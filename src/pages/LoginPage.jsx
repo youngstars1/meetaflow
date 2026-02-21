@@ -31,10 +31,15 @@ export default function LoginPage({ onSkip }) {
         clearError();
         setSuccessMsg('');
         if (mode === 'register') {
-            const { error } = await signUpWithEmail(email, password, displayName);
+            const { error, needsConfirmation } = await signUpWithEmail(email, password, displayName);
             if (!error) {
-                setRegisteredEmail(email);
-                setShowVerifyModal(true);
+                if (needsConfirmation) {
+                    // Email confirmation is ENABLED — show modal
+                    setRegisteredEmail(email);
+                    setShowVerifyModal(true);
+                }
+                // If !needsConfirmation, user is auto-logged in (session returned)
+                // onAuthStateChange will handle navigation
             }
         } else {
             await loginWithEmail(email, password);
@@ -85,7 +90,7 @@ export default function LoginPage({ onSkip }) {
                             style={{
                                 width: 64, height: 64, borderRadius: 16,
                                 marginBottom: 24,
-                                boxShadow: '0 0 30px rgba(0, 245, 212, 0.2)',
+                                boxShadow: '0 0 40px rgba(0, 229, 195, 0.15)',
                             }}
                         />
                         <h1 className="font-title" style={{ fontSize: 32, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8, letterSpacing: '-0.02em' }}>MetaFlow</h1>
@@ -116,7 +121,7 @@ export default function LoginPage({ onSkip }) {
                                     {['login', 'register'].map(m => (
                                         <button key={m} onClick={() => setMode(m)} style={{
                                             flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: mode === m ? 'var(--accent-primary)' : 'transparent',
-                                            color: mode === m ? '#fff' : 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s ease'
+                                            color: mode === m ? 'var(--text-inverse)' : 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s ease'
                                         }}>{m === 'login' ? 'Iniciar Sesión' : 'Registrarse'}</button>
                                     ))}
                                 </div>
@@ -164,8 +169,8 @@ export default function LoginPage({ onSkip }) {
                                             </div>
                                         </motion.div>
                                     </AnimatePresence>
-                                    {authError && <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255, 93, 93, 0.05)', border: '1px solid rgba(255, 93, 93, 0.2)', fontSize: 12, color: 'var(--danger)', marginBottom: 20 }}>Error: {authError}</div>}
-                                    {successMsg && <div style={{ padding: 12, borderRadius: 8, background: 'rgba(0, 245, 212, 0.05)', border: '1px solid rgba(0, 245, 212, 0.2)', fontSize: 12, color: 'var(--accent-primary)', marginBottom: 20 }}>{successMsg}</div>}
+                                    {authError && <div style={{ padding: 12, borderRadius: 10, background: 'var(--danger-muted)', border: '1px solid var(--danger-subtle)', fontSize: 12, color: 'var(--danger)', marginBottom: 20 }}>Error: {authError}</div>}
+                                    {successMsg && <div style={{ padding: 12, borderRadius: 10, background: 'var(--success-muted)', border: '1px solid var(--success-subtle)', fontSize: 12, color: 'var(--success)', marginBottom: 20 }}>{successMsg}</div>}
                                     <button type="submit" className="btn-wealth" disabled={isSubmitting} style={{ width: '100%', justifyContent: 'center', height: 48 }}>
                                         {isSubmitting ? 'Cargando...' : mode === 'login' ? 'Acceder' : 'Crear Cuenta'}
                                     </button>
@@ -177,7 +182,7 @@ export default function LoginPage({ onSkip }) {
                             {configured ? 'Probar modo offline (Solo Local)' : 'Comenzar (Modo Local)'}
                         </button>
                         {!configured && (
-                            <div style={{ marginTop: 20, padding: 12, borderRadius: 8, background: 'rgba(255, 190, 11, 0.03)', border: '1px solid rgba(255, 190, 11, 0.1)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                            <div style={{ marginTop: 20, padding: 12, borderRadius: 10, background: 'var(--warning-muted)', border: '1px solid var(--warning-subtle)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.6 }}>
                                 Aviso: El servidor de guardado remoto no está activo. Tus datos se guardarán únicamente en la memoria de este navegador.
                             </div>
                         )}

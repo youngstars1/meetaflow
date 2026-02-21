@@ -31,7 +31,7 @@ const item = {
 };
 
 const CHART_COLORS = [
-    '#00f5d4', '#70d6ff', '#ffbe0b', '#ff5d5d', '#a78bfa',
+    '#00e5c3', '#60b8f0', '#f5a623', '#f04444', '#a78bfa',
     '#34d399', '#f472b6', '#60a5fa', '#fbbf24', '#fb923c'
 ];
 
@@ -52,8 +52,8 @@ const MemoizedBarChart = memo(function MemoBarChart({ data }) {
                     formatter={(value) => formatCurrency(value)}
                 />
                 <Legend wrapperStyle={{ fontSize: 11, color: '#a1a1aa' }} />
-                <Bar dataKey="ingresos" fill="#00f5d4" radius={[4, 4, 0, 0]} name="Ingresos" />
-                <Bar dataKey="gastos" fill="#ff5d5d" radius={[4, 4, 0, 0]} name="Gastos" />
+                <Bar dataKey="ingresos" fill="#00e5c3" radius={[4, 4, 0, 0]} name="Ingresos" />
+                <Bar dataKey="gastos" fill="#f04444" radius={[4, 4, 0, 0]} name="Gastos" />
             </BarChart>
         </ResponsiveContainer>
     );
@@ -101,8 +101,8 @@ const MemoizedAreaChart = memo(function MemoAreaChart({ data }) {
             <AreaChart data={data}>
                 <defs>
                     <linearGradient id="gradientSavings" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#00f5d4" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#00f5d4" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#00e5c3" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#00e5c3" stopOpacity={0} />
                     </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
@@ -115,7 +115,7 @@ const MemoizedAreaChart = memo(function MemoAreaChart({ data }) {
                     }}
                     formatter={(v) => formatCurrency(v)}
                 />
-                <Area type="monotone" dataKey="ahorro" stroke="#00f5d4" fill="url(#gradientSavings)" strokeWidth={2} name="Ahorro" />
+                <Area type="monotone" dataKey="ahorro" stroke="#00e5c3" fill="url(#gradientSavings)" strokeWidth={2} name="Ahorro" />
             </AreaChart>
         </ResponsiveContainer>
     );
@@ -168,7 +168,7 @@ const MemoizedHabitChart = memo(function MemoHabitChart({ data }) {
                     }}
                     formatter={(v) => `${v}%`}
                 />
-                <Line type="monotone" dataKey="compliance" stroke="#70d6ff" strokeWidth={2} dot={{ r: 3, fill: '#70d6ff' }} name="Cumplimiento" />
+                <Line type="monotone" dataKey="compliance" stroke="#60b8f0" strokeWidth={2} dot={{ r: 3, fill: '#60b8f0' }} name="Cumplimiento" />
             </LineChart>
         </ResponsiveContainer>
     );
@@ -187,13 +187,15 @@ function EmptyChart({ message }) {
 function ChartCard({ icon: Icon, title, subtitle, children, gridSpan = 'bento-span-6' }) {
     return (
         <motion.div variants={item} className={`card-wealth shimmer-metal ${gridSpan}`}>
-            <div className="flex-between" style={{ marginBottom: 24 }}>
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        {Icon && <Icon size={16} color="var(--accent-primary)" />}
-                        <h3 className="font-title" style={{ fontSize: 15, fontWeight: 600 }}>{title}</h3>
+            <div style={{ marginBottom: 20 }}>
+                <div className="card-header">
+                    <div className="card-header-icon" style={{ background: 'var(--info-muted)' }}>
+                        {Icon && <Icon size={16} color="var(--info)" />}
                     </div>
-                    {subtitle && <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{subtitle}</p>}
+                    <div>
+                        <h3 style={{ fontSize: 14 }}>{title}</h3>
+                        {subtitle && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{subtitle}</p>}
+                    </div>
                 </div>
             </div>
             {children}
@@ -306,14 +308,14 @@ function Statistics() {
                     </div>
                 </motion.div>
                 <motion.div variants={item} className="card-wealth bento-span-3" style={{ textAlign: 'center' }}>
-                    <Activity size={20} color="#ff5d5d" style={{ marginBottom: 8 }} />
+                    <Activity size={20} color="var(--danger)" style={{ marginBottom: 8 }} />
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Gastos Totales</div>
                     <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Space Grotesk', color: '#fff' }}>
                         {formatCurrency(summaryStats.totalExpenses)}
                     </div>
                 </motion.div>
                 <motion.div variants={item} className="card-wealth bento-span-3" style={{ textAlign: 'center' }}>
-                    <Target size={20} color="#70d6ff" style={{ marginBottom: 8 }} />
+                    <Target size={20} color="var(--info)" style={{ marginBottom: 8 }} />
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Capital en Metas</div>
                     <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Space Grotesk', color: '#fff' }}>
                         {formatCurrency(summaryStats.totalSaved)}

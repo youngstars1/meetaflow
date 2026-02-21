@@ -7,9 +7,9 @@ import { XP_REWARDS } from '../utils/gamification';
 import { Play, Pause, RotateCcw, Coffee, Zap, ChevronDown, CheckCircle2, Rewind } from 'lucide-react';
 
 const MODES = {
-    focus: { label: 'Enfoque Profundo', minutes: 25, color: '#00f5d4' },
-    shortBreak: { label: 'Recuperación Cognitiva', minutes: 5, color: '#70d6ff' },
-    longBreak: { label: 'Reinicio del Sistema', minutes: 15, color: '#00b4d8' },
+    focus: { label: 'Enfoque Profundo', minutes: 25, color: '#00e5c3' },
+    shortBreak: { label: 'Recuperación Cognitiva', minutes: 5, color: '#60b8f0' },
+    longBreak: { label: 'Reinicio del Sistema', minutes: 15, color: '#3a9ad9' },
 };
 
 export default function PomodoroTimer() {

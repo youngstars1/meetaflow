@@ -57,10 +57,24 @@ export function AuthProvider({ children }) {
             password,
             options: {
                 data: { display_name: displayName || '' },
+                emailRedirectTo: window.location.origin,
             },
         });
-        if (error) setAuthError(error.message);
-        return { data, error };
+        if (error) {
+            // User already registered
+            if (error.message?.includes('already registered')) {
+                setAuthError('Este correo ya está registrado. Intenta iniciar sesión.');
+            } else {
+                setAuthError(error.message);
+            }
+            return { data, error };
+        }
+
+        // Check if Supabase returned a session (email confirmation DISABLED)
+        // vs just a user with no session (email confirmation ENABLED)
+        const needsConfirmation = data?.user && !data?.session;
+
+        return { data, error, needsConfirmation };
     }, [configured]);
 
     // -- Email/Password Sign In --
@@ -71,7 +85,15 @@ export function AuthProvider({ children }) {
             email,
             password,
         });
-        if (error) setAuthError(error.message);
+        if (error) {
+            if (error.message === 'Invalid login credentials') {
+                setAuthError('Credenciales incorrectas. Verifica tu correo y contraseña. Si acabas de registrarte, confirma tu email primero.');
+            } else if (error.message === 'Email not confirmed') {
+                setAuthError('Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada y spam.');
+            } else {
+                setAuthError(error.message);
+            }
+        }
         return { data, error };
     }, [configured]);
 
