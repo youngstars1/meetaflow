@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect, Suspense, lazy, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { ToastProvider } from './context/ToastContext';
@@ -6,9 +6,10 @@ import { PrivacyProvider } from './context/PrivacyContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
-import Onboarding from './components/Onboarding';
+import OnboardingWizard from './components/OnboardingWizard';
 import PomodoroTimer from './components/PomodoroTimer';
 import InstallPrompt, { registerServiceWorker } from './components/InstallPrompt';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Menu, X } from 'lucide-react';
@@ -21,6 +22,7 @@ const Routines = lazy(() => import('./pages/Routines'));
 const Statistics = lazy(() => import('./pages/Statistics'));
 const Profile = lazy(() => import('./pages/Profile'));
 const HelpGuide = lazy(() => import('./pages/HelpGuide'));
+const FixedExpenses = lazy(() => import('./pages/FixedExpenses'));
 
 // Register service worker for PWA
 registerServiceWorker();
@@ -39,11 +41,14 @@ function AppContent() {
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem('metaflow_onboarded');
   });
+  const [showLanding, setShowLanding] = useState(true);
 
   const { user, loading } = useAuth();
   const [skippedLogin, setSkippedLogin] = useState(() => {
     return !!localStorage.getItem('metaflow_skipped_login');
   });
+
+  const howItWorksRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -64,7 +69,19 @@ function AppContent() {
     );
   }
 
+  // ─── Pre-auth: Landing → Login → Onboarding → App ───
   if (!user && !skippedLogin) {
+    if (showLanding) {
+      return (
+        <LandingPage
+          onGetStarted={() => setShowLanding(false)}
+          onLearnMore={() => {
+            setShowLanding(false);
+            // Navigate to login, they can explore from there
+          }}
+        />
+      );
+    }
     return (
       <LoginPage onSkip={() => {
         localStorage.setItem('metaflow_skipped_login', 'true');
@@ -74,7 +91,7 @@ function AppContent() {
   }
 
   if (showOnboarding) {
-    return <Onboarding onComplete={() => setShowOnboarding(false)} />;
+    return <OnboardingWizard onComplete={() => setShowOnboarding(false)} />;
   }
 
   return (
@@ -107,6 +124,7 @@ function AppContent() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/finances" element={<Finances />} />
+              <Route path="/fixed-expenses" element={<FixedExpenses />} />
               <Route path="/routines" element={<Routines />} />
               <Route path="/statistics" element={<Statistics />} />
               <Route path="/profile" element={<Profile />} />

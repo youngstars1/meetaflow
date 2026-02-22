@@ -1285,3 +1285,315 @@ select.wealth-input {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PRODUCTION RESPONSIVE SYSTEM
+   Breakpoints: 1440 / 1280 / 1024 / 768 / 480
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ─── Improved scroll performance ─── */
+.page-content {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.page-content>* {
+  will-change: auto;
+}
+
+/* ─── Container max-width ─── */
+.main-content {
+  max-width: 1440px;
+}
+
+/* ─── MIN TAP TARGET (44px for all interactive) ─── */
+@media (pointer: coarse) {
+
+  button,
+  .btn-wealth,
+  .btn-wealth-outline,
+  .nav-link,
+  select.wealth-input,
+  .theme-toggle-btn {
+    min-height: 44px;
+  }
+}
+
+/* ══════════ LAPTOP ≤1280px ══════════ */
+@media (max-width: 1280px) {
+  .dashboard-hero-card {
+    padding: var(--space-6);
+  }
+
+  .dashboard-hero-balance {
+    font-size: 28px;
+  }
+
+  .dashboard-hero-metrics {
+    gap: 16px;
+  }
+}
+
+/* ══════════ TABLET ≤1024px ══════════ */
+@media (max-width: 1024px) {
+
+  /* Hero cards: stack inner layout */
+  .dashboard-hero-card>div[style*="flex"] {
+    flex-wrap: wrap;
+  }
+
+  /* Flex-between on smaller screens */
+  .flex-between {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Form actions */
+  .form-actions {
+    flex-wrap: wrap;
+  }
+
+  .form-actions>button {
+    min-width: 120px;
+  }
+
+  /* Page titles */
+  .page-title {
+    font-size: 22px;
+  }
+}
+
+/* ══════════ MOBILE ≤768px ══════════ */
+@media (max-width: 768px) {
+
+  /* ─── Page content padding ─── */
+  .page-content {
+    padding-bottom: var(--space-11);
+  }
+
+  /* ─── Hero cards ─── */
+  .dashboard-hero-card {
+    padding: var(--space-5);
+  }
+
+  .dashboard-hero-card>div[style*="flex"] {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .dashboard-hero-balance {
+    font-size: 24px !important;
+  }
+
+  .dashboard-hero-metrics {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .dashboard-hero-metric {
+    min-width: 80px;
+  }
+
+  .dashboard-hero-right {
+    position: static;
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  /* ─── Card padding reduce ─── */
+  .card-wealth {
+    padding: var(--space-4);
+  }
+
+  .card-wealth:hover {
+    transform: none;
+  }
+
+  /* ─── Hero watermark ─── */
+  .dashboard-hero-watermark {
+    font-size: 80px;
+  }
+
+  /* ─── Page header ─── */
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .page-header .btn-wealth {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+  }
+
+  /* ─── Modal ─── */
+  .modal-content {
+    padding: var(--space-5);
+    max-width: 100%;
+    margin: var(--space-3);
+    max-height: 85vh;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    padding-right: var(--space-7);
+  }
+
+  /* ─── Form ─── */
+  .bento-grid .bento-span-6.form-group {
+    grid-column: span 12;
+  }
+
+  /* ─── Buttons full-width on mobile ─── */
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions>button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ─── Fix inline-flex items wrapping ─── */
+  [style*="display: flex"][style*="gap"] {
+    flex-wrap: wrap;
+  }
+
+  /* ─── Heatmap grid adapt ─── */
+  .card-wealth div[style*="gridTemplateColumns"] {
+    font-size: 8px;
+  }
+
+  /* ─── Card header ─── */
+  .card-header {
+    gap: var(--space-2);
+  }
+
+  .card-header-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* ─── Sidebar overlay adjustment ─── */
+  .sidebar {
+    width: 280px;
+  }
+
+  /* ─── Badge cards ─── */
+  .badge-card {
+    padding: var(--space-3) var(--space-1);
+  }
+
+  .badge-card .badge-name {
+    font-size: 8px;
+  }
+
+  /* ─── Stat pills ─── */
+  .stat-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  /* ─── Large Space Grotesk numbers ─── */
+  [style*="fontSize: 28"],
+  [style*="fontSize: 32"],
+  [style*="fontSize: 36"] {
+    font-size: 22px !important;
+  }
+
+  [style*="fontSize: 24"] {
+    font-size: 20px !important;
+  }
+
+  /* ─── Guide steps ─── */
+  .guide-step {
+    padding: var(--space-5);
+  }
+}
+
+/* ══════════ SMALL MOBILE ≤480px ══════════ */
+@media (max-width: 480px) {
+  .main-content {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+
+  .dashboard-hero-card {
+    padding: var(--space-4);
+  }
+
+  .dashboard-hero-balance {
+    font-size: 20px !important;
+  }
+
+  .dashboard-hero-metric-label {
+    font-size: 8px;
+  }
+
+  .dashboard-hero-metric-value {
+    font-size: 12px;
+  }
+
+  .card-wealth {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+  }
+
+  .modal-content {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ─── Typography scaling ─── */
+  .page-title {
+    font-size: 18px;
+  }
+
+  [style*="fontSize: 22"],
+  [style*="fontSize: 20"] {
+    font-size: 18px !important;
+  }
+
+  [style*="fontSize: 16"] {
+    font-size: 14px !important;
+  }
+
+  /* ─── Buttons ─── */
+  .btn-wealth {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+
+  /* ─── Creator badge ─── */
+  .creator-badge {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 260px;
+  }
+
+  .sidebar-logo {
+    font-size: 17px;
+  }
+
+  .nav-link {
+    font-size: 12px;
+    padding: 8px var(--space-3);
+  }
+
+  /* ─── Hide non-essential data ─── */
+  .bento-grid {
+    gap: var(--space-3);
+  }
+}

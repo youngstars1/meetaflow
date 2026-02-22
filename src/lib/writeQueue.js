@@ -15,6 +15,8 @@ class WriteQueue {
         this._queue = this._load();
         this._flushing = false;
         this._listeners = new Set();
+        this._supabase = null; // Stored ref for auto-flush
+        this._deletedIds = new Set(); // Track pending deletes to prevent re-upsert
 
         // Auto-flush when coming back online
         if (typeof window !== 'undefined') {
@@ -37,6 +39,25 @@ class WriteQueue {
             return;
         }
 
+        // Track deleted IDs to prevent re-upsert race conditions
+        if (operation === 'DELETE') {
+            this._deletedIds.add(`${table}:${payload.id}`);
+            // Remove any pending UPSERT for this same item
+            this._queue = this._queue.filter(e =>
+                !(e.operation === 'UPSERT' && e.table === table && e.payload?.id === payload.id)
+            );
+        }
+
+        // Skip UPSERT if item was already deleted in this session
+        if (operation === 'UPSERT' && this._deletedIds.has(`${table}:${payload.id}`)) {
+            return;
+        }
+
+        // Deduplicate: replace existing entry for same table+id+operation
+        this._queue = this._queue.filter(e =>
+            !(e.table === table && e.payload?.id === payload.id && e.operation === operation)
+        );
+
         const entry = {
             id: crypto.randomUUID(),
             operation,
@@ -51,9 +72,9 @@ class WriteQueue {
         this._persist();
         this._notify();
 
-        // Try to flush immediately if online
-        if (navigator.onLine) {
-            this.flush();
+        // Try to flush immediately if online (use stored supabase ref)
+        if (navigator.onLine && this._supabase) {
+            this.flush(this._supabase);
         }
     }
 
@@ -62,15 +83,18 @@ class WriteQueue {
      * @param {import('@supabase/supabase-js').SupabaseClient} supabase
      */
     async flush(supabase) {
+        // Store ref for future auto-flushes
+        if (supabase) this._supabase = supabase;
+        const client = supabase || this._supabase;
         if (this._flushing || this._queue.length === 0) return;
-        if (!supabase) return;
+        if (!client) return;
 
         this._flushing = true;
         const processed = [];
 
         for (const entry of [...this._queue]) {
             try {
-                await this._execute(supabase, entry);
+                await this._execute(client, entry);
                 processed.push(entry.id);
             } catch (err) {
                 entry.retries += 1;
@@ -108,6 +132,7 @@ class WriteQueue {
     /** Clear all pending operations */
     clear() {
         this._queue = [];
+        this._deletedIds.clear();
         this._persist();
         this._notify();
     }

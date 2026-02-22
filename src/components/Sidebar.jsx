@@ -42,6 +42,7 @@ const NAV_ITEMS = [
             { to: '/', end: true, icon: LayoutDashboard, label: 'Panel' },
             { to: '/goals', icon: Target, label: 'Metas' },
             { to: '/finances', icon: Wallet, label: 'Finanzas' },
+            { to: '/fixed-expenses', icon: Wallet, label: 'Gastos Fijos' },
         ]
     },
     {

@@ -14,6 +14,7 @@ const initialState = {
     goals: [],
     transactions: [],
     routines: [],
+    fixedExpenses: [],
     envelopes: { enabled: false, rules: [] },
     profile: { name: '', email: '', incomeSources: [], currency: 'CLP' },
     gamification: { totalXP: 0, xpLog: [], earnedBadgeIds: [] },
@@ -157,6 +158,49 @@ function appReducer(state, action) {
             };
         }
 
+        // ── FIXED EXPENSES ───────────────────
+        case 'ADD_FIXED_EXPENSE': {
+            const expense = {
+                ...action.payload,
+                id: action.payload.id || generateId(),
+                name: Sanitize.html(action.payload.name),
+                amount: Finance.parse(action.payload.amount),
+                active: action.payload.active !== false,
+                frequency: action.payload.frequency || 'monthly',
+                category: action.payload.category || 'otros',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            };
+            return { ...state, fixedExpenses: [...state.fixedExpenses, expense] };
+        }
+        case 'UPDATE_FIXED_EXPENSE':
+            return {
+                ...state,
+                fixedExpenses: state.fixedExpenses.map(e => e.id === action.payload.id ? {
+                    ...e, ...action.payload,
+                    name: action.payload.name ? Sanitize.html(action.payload.name) : e.name,
+                    amount: action.payload.amount !== undefined ? Finance.parse(action.payload.amount) : e.amount,
+                    updatedAt: new Date().toISOString(),
+                } : e),
+            };
+        case 'TOGGLE_FIXED_EXPENSE':
+            return {
+                ...state,
+                fixedExpenses: state.fixedExpenses.map(e => e.id === action.payload ? {
+                    ...e, active: !e.active, updatedAt: new Date().toISOString(),
+                } : e),
+            };
+        case 'DELETE_FIXED_EXPENSE': {
+            const feToDelete = state.fixedExpenses.find(e => e.id === action.payload);
+            syncManager.syncDelete('fixed_expenses', action.payload);
+            return {
+                ...state,
+                fixedExpenses: state.fixedExpenses.filter(e => e.id !== action.payload),
+                _undoStack: [...state._undoStack, { type: 'RESTORE_FIXED_EXPENSE', data: feToDelete, timestamp: Date.now() }].slice(-10),
+            };
+        }
+        case 'RESTORE_FIXED_EXPENSE': return { ...state, fixedExpenses: [...state.fixedExpenses, action.payload] };
+
         // ── MISC ─────────────────────────────
         case 'SET_ENVELOPES': return { ...state, envelopes: action.payload };
         case 'UPDATE_PROFILE': return { ...state, profile: { ...state.profile, ...action.payload, name: action.payload.name ? Sanitize.html(action.payload.name) : state.profile.name } };
@@ -196,6 +240,7 @@ function appReducer(state, action) {
                 case 'RESTORE_GOAL': return { ...state, goals: [...state.goals, lastAction.data], _undoStack: newStack };
                 case 'RESTORE_TRANSACTION': return { ...state, transactions: [lastAction.data, ...state.transactions], _undoStack: newStack };
                 case 'RESTORE_ROUTINE': return { ...state, routines: [...state.routines, lastAction.data], _undoStack: newStack };
+                case 'RESTORE_FIXED_EXPENSE': return { ...state, fixedExpenses: [...state.fixedExpenses, lastAction.data], _undoStack: newStack };
                 default: return { ...state, _undoStack: newStack };
             }
         }
@@ -213,6 +258,11 @@ export function AppProvider({ children }) {
     // ── Step 1: Instant load from localStorage ──────
     useEffect(() => {
         const localData = hydrationService.loadLocal();
+        // Also load fixed expenses from localStorage
+        try {
+            const stored = localStorage.getItem('metaflow_fixed_expenses');
+            if (stored) localData.fixedExpenses = JSON.parse(stored);
+        } catch (e) { /* ignore */ }
         dispatch({ type: 'LOAD_DATA', payload: localData });
         setPrevXP(localData.gamification?.totalXP || 0);
     }, []);
@@ -233,15 +283,12 @@ export function AppProvider({ children }) {
                     console.log(`[AppContext] Hydrated from: ${source}, migration needed: ${needsMigration}`);
 
                     if (source !== 'local') {
-                        // Remote or merged data — update state
                         dispatch({ type: 'LOAD_DATA', payload: data });
                         setPrevXP(data.gamification?.totalXP || 0);
                     }
 
-                    // Initialize sync manager
                     syncManager.init(uid, dispatch);
 
-                    // If migration needed, sync current state to cloud
                     if (needsMigration) {
                         syncManager.onStateChange({
                             ...state,
@@ -252,7 +299,6 @@ export function AppProvider({ children }) {
                     console.warn('[AppContext] Hydration failed, continuing with localStorage:', err.message);
                 }
             } else if (uid) {
-                // Re-init sync on session refresh (token renewal)
                 syncManager.init(uid, dispatch);
             }
         });
@@ -274,6 +320,11 @@ export function AppProvider({ children }) {
         storage.saveProfile(state.profile);
         storage.set('metaflow_gamification', state.gamification);
         saveEnvelopes(state.envelopes);
+
+        // Save fixed expenses to localStorage
+        try {
+            localStorage.setItem('metaflow_fixed_expenses', JSON.stringify(state.fixedExpenses || []));
+        } catch (e) { /* ignore */ }
 
         // Sync to cloud (debounced, via SyncManager)
         if (userId) {
