@@ -22,10 +22,17 @@ class HydrationService {
      * Load data from localStorage — synchronous, instant
      */
     loadLocal() {
+        let fixedExpenses = [];
+        try {
+            const stored = localStorage.getItem('metaflow_fixed_expenses');
+            if (stored) fixedExpenses = JSON.parse(stored);
+        } catch { /* ignore */ }
+
         return {
             goals: storage.getGoals() || [],
             transactions: storage.getTransactions() || [],
             routines: storage.getRoutines() || [],
+            fixedExpenses,
             profile: storage.getProfile() || INITIAL_PROFILE,
             gamification: storage.get('metaflow_gamification') || INITIAL_GAMIFICATION,
             envelopes: getEnvelopes() || INITIAL_ENVELOPES,
@@ -112,6 +119,7 @@ class HydrationService {
             goals: this._mergeList(local.goals, remote.goals),
             transactions: this._mergeList(local.transactions, remote.transactions),
             routines: this._mergeList(local.routines, remote.routines),
+            fixedExpenses: this._mergeList(local.fixedExpenses, remote.fixedExpenses),
             profile: this._mergeProfile(local, remote),
             gamification: this._mergeGamification(local.gamification, remote.gamification),
             envelopes: remote.envelopes || local.envelopes || INITIAL_ENVELOPES,
@@ -179,6 +187,7 @@ class HydrationService {
             (data.goals?.length > 0) ||
             (data.transactions?.length > 0) ||
             (data.routines?.length > 0) ||
+            (data.fixedExpenses?.length > 0) ||
             (data.gamification?.totalXP > 0)
         );
     }
@@ -190,6 +199,8 @@ class HydrationService {
             storage.saveRoutines(data.routines || []);
             storage.saveProfile(data.profile || INITIAL_PROFILE);
             storage.set('metaflow_gamification', data.gamification || INITIAL_GAMIFICATION);
+            // Fixed expenses
+            localStorage.setItem('metaflow_fixed_expenses', JSON.stringify(data.fixedExpenses || []));
         } catch (err) {
             console.warn('[Hydration] Failed to save to localStorage:', err.message);
         }

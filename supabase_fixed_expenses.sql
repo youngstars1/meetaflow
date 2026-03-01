@@ -1,5 +1,5 @@
 -- ============================================================
--- MetaFlow: Fixed Expenses Table + RLS
+-- MetaFlow: Fixed Expenses Table + RLS (Updated v2)
 -- Run this in: Supabase Dashboard → SQL Editor → New Query
 -- ============================================================
 
@@ -19,9 +19,26 @@ create table if not exists public.fixed_expenses (
 
 alter table public.fixed_expenses enable row level security;
 
-create policy "Users own their fixed_expenses" on public.fixed_expenses
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- Drop old policy if exists (in case re-running)
+drop policy if exists "Users own their fixed_expenses" on public.fixed_expenses;
+drop policy if exists "fixed_expenses_select" on public.fixed_expenses;
+drop policy if exists "fixed_expenses_insert" on public.fixed_expenses;
+drop policy if exists "fixed_expenses_update" on public.fixed_expenses;
+drop policy if exists "fixed_expenses_delete" on public.fixed_expenses;
 
--- Index for faster queries
+-- Granular RLS policies
+create policy "fixed_expenses_select" on public.fixed_expenses for select using (auth.uid() = user_id);
+create policy "fixed_expenses_insert" on public.fixed_expenses for insert with check (auth.uid() = user_id);
+create policy "fixed_expenses_update" on public.fixed_expenses for update using (auth.uid() = user_id);
+create policy "fixed_expenses_delete" on public.fixed_expenses for delete using (auth.uid() = user_id);
+
+-- Indexes for faster queries
 create index if not exists idx_fixed_expenses_user_id on public.fixed_expenses(user_id);
 create index if not exists idx_fixed_expenses_active on public.fixed_expenses(user_id, active);
+
+-- Enable Realtime
+DO $$ BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE fixed_expenses; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+
+-- Auto-update trigger
+DROP TRIGGER IF EXISTS fixed_expenses_updated_at ON fixed_expenses;
+CREATE TRIGGER fixed_expenses_updated_at BEFORE UPDATE ON fixed_expenses FOR EACH ROW EXECUTE FUNCTION update_updated_at();

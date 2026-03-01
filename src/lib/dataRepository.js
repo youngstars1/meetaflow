@@ -133,6 +133,31 @@ const profileFromDb = (p) => ({
     updatedAt: p.updated_at,
 });
 
+// ── Fixed Expenses Mappers ────────────────────────
+const fixedExpenseToDb = (e, userId) => ({
+    id: e.id,
+    user_id: userId,
+    name: e.name || '',
+    amount: Number(e.amount) || 0,
+    category: e.category || 'otros',
+    frequency: e.frequency || 'monthly',
+    next_due_date: e.nextDueDate || null,
+    active: e.active !== false,
+    updated_at: new Date().toISOString(),
+});
+
+const fixedExpenseFromDb = (e) => ({
+    id: e.id,
+    name: e.name || '',
+    amount: Number(e.amount) || 0,
+    category: e.category || 'otros',
+    frequency: e.frequency || 'monthly',
+    nextDueDate: e.next_due_date || null,
+    active: e.active !== false,
+    createdAt: e.created_at,
+    updatedAt: e.updated_at,
+});
+
 // ── Repository Class ──────────────────────────────
 
 class DataRepository {
@@ -147,11 +172,11 @@ class DataRepository {
             .from('goals')
             .select('*')
             .eq('user_id', userId)
-            .eq('is_deleted', false)
             .order('created_at');
 
         if (error) throw new Error(`fetchGoals: ${error.message}`);
-        return (data || []).map(goalFromDb);
+        // Filter out soft-deleted rows (backward compat)
+        return (data || []).filter(r => !r.is_deleted).map(goalFromDb);
     }
 
     goalToPayload(goal, userId) {
@@ -165,11 +190,10 @@ class DataRepository {
             .from('transactions')
             .select('*')
             .eq('user_id', userId)
-            .eq('is_deleted', false)
             .order('created_at', { ascending: false });
 
         if (error) throw new Error(`fetchTransactions: ${error.message}`);
-        return (data || []).map(txFromDb);
+        return (data || []).filter(r => !r.is_deleted).map(txFromDb);
     }
 
     txToPayload(tx, userId) {
@@ -183,15 +207,38 @@ class DataRepository {
             .from('routines')
             .select('*')
             .eq('user_id', userId)
-            .eq('is_deleted', false)
             .order('created_at');
 
         if (error) throw new Error(`fetchRoutines: ${error.message}`);
-        return (data || []).map(routineFromDb);
+        return (data || []).filter(r => !r.is_deleted).map(routineFromDb);
     }
 
     routineToPayload(routine, userId) {
         return routineToDb(routine, userId);
+    }
+
+    // ── Fixed Expenses ───────────────────
+
+    async fetchFixedExpenses(userId) {
+        const { data, error } = await supabase
+            .from('fixed_expenses')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at');
+
+        if (error) {
+            // Table might not exist yet — graceful fallback
+            if (error.code === '42P01' || error.message?.includes('does not exist')) {
+                console.warn('[DataRepository] fixed_expenses table not found, using localStorage');
+                return null; // Signal to use localStorage
+            }
+            throw new Error(`fetchFixedExpenses: ${error.message}`);
+        }
+        return (data || []).map(fixedExpenseFromDb);
+    }
+
+    fixedExpenseToPayload(expense, userId) {
+        return fixedExpenseToDb(expense, userId);
     }
 
     // ── Profile ──────────────────────────
@@ -218,10 +265,11 @@ class DataRepository {
     // ── Fetch All ────────────────────────
 
     async fetchAll(userId) {
-        const [goals, transactions, routines, profileData] = await Promise.all([
+        const [goals, transactions, routines, fixedExpenses, profileData] = await Promise.all([
             this.fetchGoals(userId),
             this.fetchTransactions(userId),
             this.fetchRoutines(userId),
+            this.fetchFixedExpenses(userId).catch(() => null),
             this.fetchProfile(userId),
         ]);
 
@@ -229,6 +277,7 @@ class DataRepository {
             goals,
             transactions,
             routines,
+            fixedExpenses: fixedExpenses || [], // null means table doesn't exist
             profile: profileData?.profile || { name: '', currency: 'CLP', incomeSources: [] },
             gamification: profileData?.gamification || { totalXP: 0, xpLog: [], earnedBadgeIds: [] },
             envelopes: profileData?.envelopes || { enabled: false, rules: [] },
@@ -239,7 +288,7 @@ class DataRepository {
 // Singleton
 export const dataRepository = new DataRepository();
 
-// Export mappers for WriteQueue usage
+// Export mappers for SyncManager / WriteQueue usage
 export const mappers = {
     goalToDb,
     goalFromDb,
@@ -249,4 +298,7 @@ export const mappers = {
     routineFromDb,
     profileToDb,
     profileFromDb,
+    fixedExpenseToDb,
+    fixedExpenseFromDb,
 };
+

@@ -152,13 +152,21 @@ class WriteQueue {
                 break;
             }
             case 'DELETE': {
+                // Use real DELETE — removes row from database entirely
                 const { error } = await supabase
                     .from(table)
-                    .update({ is_deleted: true, updated_at: new Date().toISOString() })
+                    .delete()
                     .eq('id', payload.id)
                     .eq('user_id', userId);
 
-                if (error) throw new Error(`DELETE ${table}: ${error.message}`);
+                if (error) {
+                    // If row doesn't exist, that's fine (already deleted)
+                    if (error.code === 'PGRST116' || error.message?.includes('0 rows')) {
+                        console.log(`[WriteQueue] DELETE ${table}:${payload.id} — already gone`);
+                    } else {
+                        throw new Error(`DELETE ${table}: ${error.message}`);
+                    }
+                }
                 break;
             }
             default:
