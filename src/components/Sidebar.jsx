@@ -8,7 +8,7 @@ import { calculateLevel, getLevelTitle, getXPForNextLevel, getLevelIcon } from '
 import {
     LayoutDashboard, Target, Wallet, CalendarCheck, BarChart3,
     Settings, Smartphone, LogOut, LogIn, User, BookOpen,
-    ExternalLink, Sun, Moon, ChevronRight
+    ExternalLink, Sun, Moon, ChevronRight, PiggyBank
 } from 'lucide-react';
 
 function useInstallPWA() {
@@ -43,6 +43,7 @@ const NAV_ITEMS = [
             { to: '/goals', icon: Target, label: 'Metas' },
             { to: '/finances', icon: Wallet, label: 'Finanzas' },
             { to: '/fixed-expenses', icon: Wallet, label: 'Gastos Fijos' },
+            { to: '/savings-challenge', icon: PiggyBank, label: 'Mi Ahorro' },
         ]
     },
     {

@@ -1,0 +1,594 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SAVINGS CHALLENGE — Mi Ahorro Programado CLP
+   Premium FinTech gamified savings board
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ─── Empty / Welcome Hero ─── */
+.sc-empty-hero {
+    text-align: center;
+    padding: 60px 24px 80px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.sc-empty-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0, 229, 195, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.sc-empty-icon-wrapper {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: var(--success-muted);
+    border: 2px solid var(--success-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    color: var(--accent-primary);
+    animation: pulse-glow 3s ease infinite;
+}
+
+.sc-btn-start {
+    padding: 14px 32px !important;
+    font-size: 15px !important;
+    border-radius: var(--radius-lg) !important;
+    gap: 10px !important;
+}
+
+/* ─── Setup: Preset Chips ─── */
+.sc-preset-chip {
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.sc-preset-chip:hover {
+    background: var(--success-muted);
+    border-color: var(--success-subtle);
+    color: var(--accent-primary);
+}
+
+.sc-preset-chip.active {
+    background: var(--success-muted);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: 0 0 12px rgba(0, 229, 195, 0.15);
+}
+
+/* ─── Setup: Mode Selector ─── */
+.sc-mode-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.sc-mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-secondary);
+    transition: all var(--transition-normal);
+}
+
+.sc-mode-btn:hover {
+    border-color: var(--border-interactive);
+    background: var(--bg-card-hover);
+}
+
+.sc-mode-btn.active {
+    border-color: var(--accent-primary);
+    background: var(--success-muted);
+    color: var(--text-primary);
+    box-shadow: 0 0 20px rgba(0, 229, 195, 0.08);
+}
+
+.sc-mode-btn svg {
+    flex-shrink: 0;
+    color: var(--accent-primary);
+}
+
+/* ─── Setup: Custom Amounts List ─── */
+.sc-custom-list {
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.sc-custom-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-secondary);
+    transition: background var(--transition-fast);
+}
+
+.sc-custom-item:last-of-type {
+    border-bottom: none;
+}
+
+.sc-custom-item:hover {
+    background: var(--bg-elevated);
+}
+
+/* ─── Stats Grid ─── */
+.sc-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.sc-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px !important;
+}
+
+.sc-stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sc-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.sc-stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+/* ─── Progress Bar ─── */
+.sc-progress-bar {
+    width: 100%;
+    height: 10px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-full);
+    overflow: visible;
+    position: relative;
+}
+
+.sc-progress-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: var(--radius-full);
+    position: relative;
+    box-shadow: 0 0 16px rgba(0, 229, 195, 0.3);
+}
+
+.sc-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+    animation: shimmer-bar 2.5s ease infinite;
+    border-radius: var(--radius-full);
+}
+
+.sc-milestone-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.sc-milestone-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-primary);
+    transition: all 0.4s var(--ease-out);
+}
+
+.sc-milestone-marker.reached .sc-milestone-dot {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 8px rgba(0, 229, 195, 0.4);
+}
+
+/* ─── Motivation Quote ─── */
+.sc-motivation {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--success-muted);
+    border: 1px solid var(--success-subtle);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-primary);
+    text-align: center;
+    letter-spacing: 0.01em;
+}
+
+/* ─── Blocks Board ─── */
+.sc-blocks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    padding: 16px;
+}
+
+.sc-block {
+    position: relative;
+    padding: 14px 8px;
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s var(--ease-out);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sc-block::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 229, 195, 0.04), transparent);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.sc-block:hover {
+    border-color: var(--border-interactive);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.sc-block:hover::before {
+    opacity: 1;
+}
+
+.sc-block:active {
+    transform: translateY(0) scale(0.97);
+}
+
+/* Selected block */
+.sc-block.selected {
+    background: var(--success-muted);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 16px rgba(0, 229, 195, 0.12), inset 0 0 12px rgba(0, 229, 195, 0.05);
+}
+
+.sc-block.selected::before {
+    background: linear-gradient(135deg, rgba(0, 229, 195, 0.08), rgba(96, 184, 240, 0.04));
+    opacity: 1;
+}
+
+.sc-block.selected .sc-block-amount {
+    color: var(--accent-primary);
+}
+
+/* Block animation */
+.sc-block.animating {
+    animation: blockPop 0.4s var(--ease-spring);
+}
+
+@keyframes blockPop {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.sc-block-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: -0.01em;
+    position: relative;
+    z-index: 1;
+    transition: color 0.25s ease;
+}
+
+.sc-block-check {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    color: var(--accent-primary);
+    filter: drop-shadow(0 0 4px rgba(0, 229, 195, 0.3));
+}
+
+/* ─── Milestone Popup ─── */
+.sc-milestone-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    backdrop-filter: blur(8px);
+}
+
+.sc-milestone-card {
+    background: var(--bg-card-solid);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2xl);
+    padding: 40px 36px 32px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    box-shadow: var(--shadow-xl), 0 0 60px rgba(0, 229, 195, 0.1);
+}
+
+.sc-milestone-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.sc-milestone-close:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.sc-milestone-emoji {
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 16px;
+}
+
+.sc-milestone-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+}
+
+.sc-milestone-message {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+/* ─── Breakdown Grid ─── */
+.sc-breakdown-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sc-breakdown-item {
+    display: grid;
+    grid-template-columns: 100px 1fr 50px;
+    gap: 12px;
+    align-items: center;
+}
+
+.sc-breakdown-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.sc-breakdown-bar-track {
+    height: 6px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.sc-breakdown-bar-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: var(--radius-full);
+}
+
+.sc-breakdown-count {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+/* ─── Light Mode Adjustments ─── */
+:root[data-theme="light"] .sc-empty-hero {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+:root[data-theme="light"] .sc-empty-hero::before {
+    background: radial-gradient(ellipse at 50% 0%, rgba(0, 184, 156, 0.06) 0%, transparent 60%);
+}
+
+:root[data-theme="light"] .sc-block {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+:root[data-theme="light"] .sc-block.selected {
+    background: rgba(0, 184, 156, 0.08);
+}
+
+:root[data-theme="light"] .sc-milestone-card {
+    background: #fff;
+    box-shadow: var(--shadow-xl);
+}
+
+:root[data-theme="light"] .sc-progress-bar {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+:root[data-theme="light"] .sc-milestone-dot {
+    background: #fff;
+}
+
+/* ─── Responsive: Tablet ─── */
+@media (max-width: 1024px) {
+    .sc-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ─── Responsive: Mobile ─── */
+@media (max-width: 768px) {
+    .sc-stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .sc-stat-card {
+        padding: 14px !important;
+        gap: 10px;
+    }
+
+    .sc-stat-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .sc-stat-value {
+        font-size: 15px;
+    }
+
+    .sc-blocks-grid {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        gap: 6px;
+        padding: 12px;
+    }
+
+    .sc-block {
+        padding: 10px 6px;
+    }
+
+    .sc-block-amount {
+        font-size: 11px;
+    }
+
+    .sc-block-check {
+        top: 2px;
+        right: 2px;
+    }
+
+    .sc-block-check svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .sc-mode-selector {
+        grid-template-columns: 1fr;
+    }
+
+    .sc-empty-hero {
+        padding: 40px 20px 60px;
+    }
+
+    .sc-empty-icon-wrapper {
+        width: 72px;
+        height: 72px;
+    }
+
+    .sc-empty-icon-wrapper svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .sc-milestone-card {
+        padding: 32px 24px 28px;
+    }
+
+    .sc-milestone-emoji {
+        font-size: 44px;
+    }
+
+    .sc-milestone-title {
+        font-size: 18px;
+    }
+
+    .sc-breakdown-item {
+        grid-template-columns: 80px 1fr 40px;
+        gap: 8px;
+    }
+}
+
+/* ─── Responsive: Small Mobile ─── */
+@media (max-width: 480px) {
+    .sc-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .sc-blocks-grid {
+        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .sc-block-amount {
+        font-size: 10px;
+    }
+
+    .sc-stat-card {
+        flex-direction: row;
+        padding: 12px 14px !important;
+    }
+}

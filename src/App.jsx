@@ -23,6 +23,7 @@ const Statistics = lazy(() => import('./pages/Statistics'));
 const Profile = lazy(() => import('./pages/Profile'));
 const HelpGuide = lazy(() => import('./pages/HelpGuide'));
 const FixedExpenses = lazy(() => import('./pages/FixedExpenses'));
+const SavingsChallenge = lazy(() => import('./pages/SavingsChallenge'));
 
 // Register service worker for PWA
 registerServiceWorker();
@@ -129,6 +130,7 @@ function AppContent() {
               <Route path="/statistics" element={<Statistics />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/guide" element={<HelpGuide />} />
+              <Route path="/savings-challenge" element={<SavingsChallenge />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>
